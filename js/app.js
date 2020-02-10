@@ -91,10 +91,11 @@ function activeSectionDecorator(event){
             const topOfSection = section.getBoundingClientRect().top;
             const currentTopmost = topmost.getBoundingClientRect().top;
             if(Math.abs(topOfSection) < Math.abs(currentTopmost)){
-                topmost = section;
                 console.log(`Section #${topmost.id} is topmost`);
+                topmost.classList.remove("your-active-class");
+                topmost = section;
+                section.classList.add("your-active-class");
                 // TODO handle styles
-                // add class
                 // highlight menu item
             }
         }
