@@ -34,13 +34,13 @@ function navigationBuilder() {
     const navBar = document.getElementById("navbar__list");
     const sections = document.getElementsByTagName("section");
     const display = navBar.style.display;
-    const log = {};
+    const log = [];
     navBar.style.display = "none";
     for(section of sections){
         const newItemTitle = extractSectionHeader(section.id);
         const newItemId = `${section.id}_navbarItem`;
         const newItem = createMenuItemElement(newItemTitle, newItemId);
-        log[newItemId] = section.id;
+        log.push({sectionId: section.id, newItemId: newItemId});
         navBar.appendChild(newItem);
     };
     navBar.style.display = display;
@@ -79,11 +79,26 @@ function extractSectionHeader(sectionId) {
 
 // Add class 'active' to section when near top of viewport
 function activeSectionDecorator(event){
-    console.log(event.log);
-    // register listener
-    // on scroll check the topmost using log
-    // add class
-    // highlight menu item
+    const log = event.log;
+    const sections = log.map(i => document.getElementById(i.sectionId));
+    let topmost = null;
+    window.addEventListener('scroll', function(e) {
+        for(section of sections){
+            if(topmost == null){
+                topmost = section;
+                continue;
+            }
+            const topOfSection = section.getBoundingClientRect().top;
+            const currentTopmost = topmost.getBoundingClientRect().top;
+            if(Math.abs(topOfSection) < Math.abs(currentTopmost)){
+                topmost = section;
+                console.log(`Section #${topmost.id} is topmost`);
+                // TODO handle styles
+                // add class
+                // highlight menu item
+            }
+        }
+    });
 }
 
 // Scroll to anchor ID using scrollTO event
