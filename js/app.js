@@ -40,7 +40,7 @@ function navigationBuilder() {
         const newItemTitle = extractSectionHeader(section.id);
         const newItemId = `${section.id}_navbarItem`;
         const newItem = createMenuItemElement(newItemTitle, newItemId);
-        log.push({sectionId: section.id, newItemId: newItemId});
+        log.push({sectionId: section.id, menuItemId: newItemId});
         navBar.appendChild(newItem);
     };
     navBar.style.display = display;
@@ -91,12 +91,19 @@ function activeSectionDecorator(event){
             const topOfSection = section.getBoundingClientRect().top;
             const currentTopmost = topmost.getBoundingClientRect().top;
             if(Math.abs(topOfSection) < Math.abs(currentTopmost)){
+                topmost = section;
                 console.log(`Section #${topmost.id} is topmost`);
                 topmost.classList.remove("your-active-class");
-                topmost = section;
                 section.classList.add("your-active-class");
-                // TODO handle styles
-                // highlight menu item
+                
+                for(s of sections){
+                    const menuItemId = log.find(e => e.sectionId == s.id).menuItemId;
+                    const menuItem = document.getElementById(menuItemId);
+                    if(s.id == topmost.id)
+                        menuItem.classList.add("active");
+                    else
+                        menuItem.classList.remove("active");
+                }
             }
         }
     });
