@@ -21,7 +21,6 @@
 const NAV_BUILT = "navigationBuilt";
 
 document.addEventListener("DOMContentLoaded", navigationBuilder);
-document.addEventListener(NAV_BUILT, onClickScroller);
 document.addEventListener(NAV_BUILT, activeSectionDecorator);
 
 
@@ -79,6 +78,10 @@ function extractSectionHeader(sectionId) {
     return document.querySelector(`#${sectionId} h2`).textContent;
 }
 
+
+
+
+
 // Add class 'active' to section when near top of viewport
 function activeSectionDecorator(event){
     const log = event.log;
@@ -122,11 +125,4 @@ const getSectionActiveUpdater = function(oldTop, newTop, log){
                 menuItem.classList.remove("active");
         }
     }
-}
-
-// Scroll to anchor ID using scrollTO event
-function onClickScroller(event){
-    console.log(event.log);
-    // for every menu item id of log create a click 
-    // handler that throws scrollTo event
 }
