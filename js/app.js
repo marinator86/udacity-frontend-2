@@ -38,9 +38,8 @@ function navigationBuilder() {
     navBar.style.display = "none";
     for(section of sections){
         const newItemTitle = extractSectionHeader(section.id);
-        const newItemId = `${section.id}_navbarItem`;
-        const newItem = createMenuItemElement(newItemTitle, newItemId);
-        log.push({sectionId: section.id, menuItemId: newItemId});
+        const newItem = createMenuItemElement(newItemTitle, section.id);
+        log.push({sectionId: section.id, menuItemId: newItem.id});
         navBar.appendChild(newItem);
     };
     navBar.style.display = display;
@@ -60,10 +59,13 @@ function createNavBuiltEvent(log) {
  */
 function createMenuItemElement(title, id) {
     const newItem = document.createElement("li");
+    const link = document.createElement("a");
+    link.setAttribute("href", `#${id}`);
+    link.textContent = title
+    newItem.appendChild(link);
     newItem.classList.add("menu__link");
-    newItem.id = id;
+    newItem.id = `${id}_navbarItem`;
     console.log(`Section ${title} found to add`);
-    newItem.textContent = title;
     return newItem;
 }
 
@@ -83,30 +85,43 @@ function activeSectionDecorator(event){
     const sections = log.map(i => document.getElementById(i.sectionId));
     let topmost = null;
     window.addEventListener('scroll', function(e) {
+        const oldTop = topmost;
+        
         for(section of sections){
             if(topmost == null){
                 topmost = section;
                 continue;
             }
-            const topOfSection = section.getBoundingClientRect().top;
+            const currentSectionTop = section.getBoundingClientRect().top;
             const currentTopmost = topmost.getBoundingClientRect().top;
-            if(Math.abs(topOfSection) < Math.abs(currentTopmost)){
+            if(Math.abs(currentSectionTop) < Math.abs(currentTopmost)){
                 topmost = section;
                 console.log(`Section #${topmost.id} is topmost`);
-                topmost.classList.remove("your-active-class");
-                section.classList.add("your-active-class");
-                
-                for(s of sections){
-                    const menuItemId = log.find(e => e.sectionId == s.id).menuItemId;
-                    const menuItem = document.getElementById(menuItemId);
-                    if(s.id == topmost.id)
-                        menuItem.classList.add("active");
-                    else
-                        menuItem.classList.remove("active");
-                }
             }
         }
+
+        const activeSectionChanged = topmost != oldTop;
+        if(activeSectionChanged)
+            window.setTimeout(getSectionActiveUpdater(oldTop, topmost, log), 0);
     });
+}
+
+const getSectionActiveUpdater = function(oldTop, newTop, log){
+    return function() {
+        if(oldTop)
+            oldTop.classList.remove("your-active-class");
+        newTop.classList.add("your-active-class");
+        
+        // iterate over all menu items and set/unset
+        for(entry of log){
+            const menuItemId = entry.menuItemId;
+            const menuItem = document.getElementById(menuItemId);
+            if(entry.sectionId == newTop.id)
+                menuItem.classList.add("active");
+            else
+                menuItem.classList.remove("active");
+        }
+    }
 }
 
 // Scroll to anchor ID using scrollTO event
